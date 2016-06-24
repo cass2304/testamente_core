@@ -40,9 +40,14 @@ class ApiAuthController extends Controller
     // Registro de Usuarios
     
     public function register(Request $request) {
+
         // Se crea la variable de nuevo usuario
-        $newUser = new User($request->all());
-        $newUser->password = bcrypt($request->password); // Se encripta el Password
+        $newUser = User::create ($request->all());
+
+        // Se encripta el Password
+        $newUser->password = bcrypt($request->password); 
+        
+        // Se Guarda el registro en la BD
         $newUser->save();
 
         // Verificamos que se haya credo el usuario
@@ -55,6 +60,43 @@ class ApiAuthController extends Controller
 
     }
 
+    // Cambio de contraseña
+    
+    public function NewPasswd(Request $request) {
+
+       // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD 
+       $FindUser = User::where("email", "=", $request->input("email"))->first(); 
+
+       // Se verifica si el email existe en la BD
+        if ($FindUser!=null) {
+
+       // Si el email existe se actualiza el campo del password para ese usuario
+           $FindUser->update(['password' => bcrypt($request->input("password"))]);
+
+       // Se guarda el registro en la BD 
+           $FindUser->save();
+
+       // Retorna un Json con el usuario que actualizo el password
+           return response()->json($FindUser);  
+        }
+
+    }
+
+   // Eliminar registro
+    
+    public function delete(Request $request) {
+
+       // Se Recibe el id del registro 
+       $deleteUser = User::where("id", "=", $request->get("id"))->first(); 
+       
+       // Se Elimina el registro de la BD 
+       $deleteUser->delete();
+
+       // Retorna un Json con el usuario que actualizo el password
+       return response()->json('Registro Eliminado Satisfactoriamente');  
+       
+
+    }
        
     public function index(Request $request)
     {
@@ -73,71 +115,4 @@ class ApiAuthController extends Controller
               return response()->json(['error' => 'Usuario o Clave invalidos'], 401);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
-    {
-    
-     
-    
-  }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
