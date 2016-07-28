@@ -12,12 +12,12 @@ class property extends Model
 
 
   public function User(){
-    return $this->belongsToMany('\App\User');
+    return $this->belongsTo('\App\User');
 
   	}
 
     public function beneficiary(){
-      return $this->belongsToMany('\App\beneficiary');
+      return $this->belongsTo('\App\beneficiary');
 
     	}
 }
