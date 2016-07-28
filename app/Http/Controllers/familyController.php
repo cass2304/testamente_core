@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\family_information;
 
 class familyController extends Controller
 {
@@ -14,74 +15,62 @@ class familyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
+        public function register(Request $request) {
+
+        // Se crean los registros en la tabla de informacion personal
+        $newFamily_information = family_information::create ($request->all());
+
+
+        // Se Guarda el registro en la BD
+        $newFamily_information->save();
+
+        // Verificamos que se haya credo el usuario
+        if ($newFamily_information->save()) {
+          return response()->json(["Datos Creados Correctamente"]);
+        }
+        // Si hay un error
+        return response()->json(["Error"]);
+
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function show(Request $request)
     {
-        //
+      // Se Recibe el user_id del registro
+      $ShowRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
+
+      // Muestra el registro segun el user_id
+      return $ShowRegistro;
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function destroy(Request $request) {
+
+       // Se Recibe el id del registro
+       $deleteRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
+
+       // Se Elimina el registro de la BD
+       $deleteRegistro->delete();
+
+       // Retorna un Json
+       return response()->json('Registro Eliminado Satisfactoriamente');
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+      // Se Recibe el id del registro
+      $updateRegistro = family_information::find($id);
+
+      // Se actualiza el registro
+      $updateRegistro->fill($request->all());
+
+      $updateRegistro->save();
+
+      return response()->json('Registro Actualizado Satisfactoriamente');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
+
+
 }
