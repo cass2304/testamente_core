@@ -13,7 +13,20 @@ class CreateAditionalQuestionsTable extends Migration
     public function up()
     {
         Schema::create('aditional_questions', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id_aditional');
+            $table->string('nro_questions');
+            $table->string('questions');
+            $table->string('answer');
+            $table->string('step');
+            $table->string('type');
+            $table->timestamps();
+            $table->integer('id_documents')->unsigned();
+
+            $table->foreign('id_documents')
+            ->references('id_documents')
+            ->on('documents')
+            ->onDelete('cascade');
+
             $table->timestamps();
         });
     }

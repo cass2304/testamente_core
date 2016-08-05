@@ -14,7 +14,15 @@ class CreateAditionalQuestionsDetailTable extends Migration
     {
         Schema::create('aditional_questions_detail', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('id_documents')->unsigned();
+            $table->string('label');
+            $table->string('value');
             $table->timestamps();
+            $table->foreign('id_documents')
+            ->references('id_documents')
+            ->on('aditional_questions')
+            ->onDelete('cascade');
+
         });
     }
 
