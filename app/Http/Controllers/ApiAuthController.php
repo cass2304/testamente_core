@@ -40,61 +40,72 @@ class ApiAuthController extends Controller
     // Registro de Usuarios
 
     public function register(Request $request) {
+      $password = Crypt::encrypt($request->input('password'));
+      $credentials = array(
+         'name' => $request->input('name'),
+         'email' => $request->input('email'),
+         'password' => $password,
+      );
 
-        // Se crea la variable de nuevo usuario
-        $newUser = User::create ($request->all());
+      $email 	= array(
 
-        // Se encripta el Password
-        $newUser->password = bcrypt($request->password);
+         'email' => $request->input('email'),
 
-        // Se Guarda el registro en la BD
-        $newUser->save();
+      );
+      $Findemail = User::where('email', $email )->first();
+      if ($Findemail) {
+          return response()->json(['error' => 'EL Usuario ya esta rgistrado.'], 401);
+      }
+      $user = User::create($credentials);
+      $email 	= array(
 
-        // Verificamos que se haya credo el usuario
-        if ($newUser->save()) {
-          return response()->json(["Usuario Creado Correctamente"]);
-        }
-        // Si hay un error
-        return response()->json(["no pudo ser creado el usuario"]);
+         'email' => $request->input('email'),
+
+      );
+      $Findstep = User::where('email', $email )->first();
+      // Se verifica si el email existe en la BD
+       if ($Findstep!=null) {
+          $step = "1";
+      // Se llena la tabla documents con los primeros registros
+      $Documents = new documents;
+      $Documents ->user_id = $Findstep->id;
+      $Documents ->step = $step;
+
+      $Documents->save();
+      $token = JWTAuth::fromUser($user);
+      return response()->json('OK, Registro realizado');
 
 
-    }
+
+  }
+      }
 
     // Cambio de contraseña
 
-    public function NewPasswd(Request $request) {
+      public function NewPasswd(Request $request) {
 
-       // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
-       $FindUser = User::where("email", "=", $request->input("email"))->first();
+        $token = $request->header('token');
 
-       // Se verifica si el email existe en la BD
-        if ($FindUser!=null) {
+        if ($user = JWTAuth::toUser($token))
 
-       // Si el email existe se actualiza el campo del password para ese usuario
-           $FindUser->update(['password' => bcrypt($request->input("password"))]);
+         {
+            $email= $request->input("email");
+           // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
+           $FindUser = User::where("email", "=", $email )->first();
 
-       // Se guarda el registro en la BD
-           $FindUser->save();
+           // Se verifica si el email existe en la BD
+            if ($FindUser!=null) {
 
-       // Retorna un Json con el usuario que actualizo el password
-           return response()->json($FindUser);
+           // Si el email existe se actualiza el campo del password para ese usuario
+               $FindUser->update(['password' => bcrypt($request->input("password"))]);
+
+           // Se guarda el registro en la BD
+               $FindUser->save();
+
+           // Retorna un Json con el usuario que actualizo el password
+               return response()->json($FindUser);
+            }
         }
-
-    }
-
-   // Eliminar registro
-
-    public function delete(Request $request) {
-
-       // Se Recibe el id del registro
-       $deleteUser = User::where("id", "=", $request->get("id"))->first();
-
-       // Se Elimina el registro de la BD
-       $deleteUser->delete();
-
-       // Retorna un Json con el usuario que actualizo el password
-       return response()->json('Registro Eliminado Satisfactoriamente');
-
 
     }
 
