@@ -13,7 +13,7 @@ class CreateAditionalQuestionsTable extends Migration
     public function up()
     {
         Schema::create('aditional_questions', function (Blueprint $table) {
-            $table->increments('id_aditional');
+            $table->increments('id');
             $table->string('nro_questions');
             $table->string('questions');
             $table->string('answer');
@@ -23,7 +23,7 @@ class CreateAditionalQuestionsTable extends Migration
             $table->integer('id_documents')->unsigned();
 
             $table->foreign('id_documents')
-            ->references('id_documents')
+            ->references('id')
             ->on('documents')
             ->onDelete('cascade');
 
