@@ -13,8 +13,14 @@ class CreateDocumentsTable extends Migration
     public function up()
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id_documents');
+            $table->integer('user_id')->unsigned();
+            $table->string('step');
             $table->timestamps();
+            $table->foreign('user_id')
+              ->references('id')
+              ->on('users')
+              ->onDelete('cascade');
         });
     }
 
