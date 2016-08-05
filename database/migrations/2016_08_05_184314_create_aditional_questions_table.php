@@ -27,7 +27,7 @@ class CreateAditionalQuestionsTable extends Migration
             ->on('documents')
             ->onDelete('cascade');
 
-            $table->timestamps();
+            
         });
     }
 
