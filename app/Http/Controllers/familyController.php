@@ -17,6 +17,11 @@ class familyController extends Controller
      */
         public function register(Request $request) {
 
+      // Obtenemos los datos del token
+      $token = $request->header('token');
+
+      if ($user = JWTAuth::toUser($token))
+      {
         // Se crean los registros en la tabla de informacion personal
         $newFamily_information = family_information::create ($request->all());
 
@@ -30,44 +35,58 @@ class familyController extends Controller
         }
         // Si hay un error
         return response()->json(["Error"]);
-
+     }
 
     }
 
     public function show(Request $request)
     {
-      // Se Recibe el user_id del registro
-      $ShowRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
+      // Obtenemos los datos del token
+      $token = $request->header('token');
 
-      // Muestra el registro segun el user_id
-      return $ShowRegistro;
+      if ($user = JWTAuth::toUser($token))
+      {
+        // Se Recibe el user_id del registro
+        $ShowRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
 
+        // Muestra el registro segun el user_id
+        return $ShowRegistro;
+      }
     }
 
     public function destroy(Request $request) {
+      // Obtenemos los datos del token
+      $token = $request->header('token');
 
-       // Se Recibe el id del registro
-       $deleteRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
+      if ($user = JWTAuth::toUser($token))
+      {
+         // Se Recibe el id del registro
+         $deleteRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
 
-       // Se Elimina el registro de la BD
-       $deleteRegistro->delete();
+         // Se Elimina el registro de la BD
+         $deleteRegistro->delete();
 
-       // Retorna un Json
-       return response()->json('Registro Eliminado Satisfactoriamente');
-
+         // Retorna un Json
+         return response()->json('Registro Eliminado Satisfactoriamente');
+       }
     }
 
     public function update(Request $request, $id)
     {
-      // Se Recibe el id del registro
-      $updateRegistro = family_information::find($id);
+      $token = $request->header('token');
 
-      // Se actualiza el registro
-      $updateRegistro->fill($request->all());
+      if ($user = JWTAuth::toUser($token))
+      {
+        // Se Recibe el id del registro
+        $updateRegistro = family_information::find($id);
 
-      $updateRegistro->save();
+        // Se actualiza el registro
+        $updateRegistro->fill($request->all());
 
-      return response()->json('Registro Actualizado Satisfactoriamente');
+        $updateRegistro->save();
+
+        return response()->json('Registro Actualizado Satisfactoriamente');
+      }
     }
 
 
