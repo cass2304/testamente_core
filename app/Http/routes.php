@@ -19,7 +19,9 @@ Route::group(['middleware' => 'cors'], function()
     Route::get('/users', 'ApiAuthController@index');          // Muestra la lista de Usuarios
 
     Route::post('/documents','documentController@update');    // Update de la tabla documents luego de siguiente
-    
+
+    Route::post('/documents/show','documentController@index');    // Update de la tabla documents luego de siguiente
+
     Route::group(['prefix' => 'clients'], function () {
 
     Route::post('/info', 'personalController@register');      // Crea el registro
