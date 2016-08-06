@@ -1,6 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+/*------ USE de JWT: Inicio-------- */
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
+/*------  USE de JWT: Fin -------- */
 
 use Illuminate\Http\Request;
 
@@ -24,7 +29,6 @@ class familyController extends Controller
       {
         // Se crean los registros en la tabla de informacion personal
         $newFamily_information = family_information::create ($request->all());
-
 
         // Se Guarda el registro en la BD
         $newFamily_information->save();
