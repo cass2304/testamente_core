@@ -89,6 +89,10 @@ class documentController extends Controller
      */
     public function update(Request $request)
     {
+      $token = $request->header('token');
+
+      if ($user = JWTAuth::toUser($token))
+      {
         $userid = $request->get('user_id');
         $Findstep = documents::where('user_id', $userid )->first();
         // Se verifica si el email existe en la BD
@@ -105,7 +109,7 @@ class documentController extends Controller
             return response()->json('OK, Next Step update');
 
          }
-
+      }
 
     }
 
