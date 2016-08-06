@@ -75,21 +75,30 @@ class familyController extends Controller
        }
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
       $token = $request->header('token');
 
       if ($user = JWTAuth::toUser($token))
       {
-        // Se Recibe el id del registro
-        $updateRegistro = family_information::find($id);
+        $userid = $request->get('user_id');
 
-        // Se actualiza el registro
-        $updateRegistro->fill($request->all());
+        $family_information = family_information::where('user_id', $userid )->first();
 
-        $updateRegistro->save();
+        // Se verifica si el user_id existe en la tabla
 
-        return response()->json('Registro Actualizado Satisfactoriamente');
+         if ($family_information!=null) {
+
+        // Si el email existe se actualiza el campo del password para ese usuario
+            $family_information->update($request->all());
+
+        // Se guarda el registro en la BD
+            $family_information->save();
+
+        // Retorna un Json
+
+            return response()->json('OK, Next Step update');
+
       }
     }
 
