@@ -15,10 +15,22 @@ class documentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
-    }
+     public function index(Request $request)
+     {
+          // Obtenemos los datos del Login
+         $credentials = $request->only('email', 'password');
+         $token = null;
+
+         // Se verifica si hay un token
+          if ($token = JWTAuth::attempt($credentials))
+           {
+               // Si las credenciales existen Retorna un Json con la lista de usuarios del modelo User
+               return response()->json(documents::all());
+           }
+
+           //  Si no existen las credenciales se muestra un error
+               return response()->json(['error' => 'Usuario o Clave invalidos'], 401);
+     }
 
     /**
      * Show the form for creating a new resource.

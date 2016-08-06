@@ -17,35 +17,52 @@ class personalController extends Controller
      */
      public function register(Request $request) {
 
-         // Se crean los registros en la tabla de informacion personal
-         $newPersonal_information = personal_information::create ($request->all());
+        // Obtenemos los datos del token
+        $token = $request->header('token');
 
+        if ($user = JWTAuth::toUser($token))
+         {
+           // Se crean los registros en la tabla de informacion personal
+           $newPersonal_information = personal_information::create ($request->all());
 
-         // Se Guarda el registro en la BD
-         $newPersonal_information->save();
+           // Se Guarda el registro en la BD
+           $newPersonal_information->save();
 
-         // Verificamos que se haya credo el usuario
-         if ($newPersonal_information->save()) {
-           return response()->json(["Datos Creados Correctamente"]);
+           // Verificamos que se haya credo el usuario
+           if ($newPersonal_information->save()) {
+             return response()->json(["Datos Creados Correctamente"]);
+           }
+           // Si hay un error
+           return response()->json(["Error"]);
+
          }
-         // Si hay un error
-         return response()->json(["Error"]);
-
 
      }
 
     public function show(Request $request)
     {
+      // Obtenemos los datos del token
+      $token = $request->header('token');
+
+      if ($user = JWTAuth::toUser($token))
+      {
+
       // Se Recibe el user_id del registro
       $ShowRegistro = personal_information::where("user_id", "=", $request->get("user_id"))->first();
 
       // Muestra el registro segun el user_id
       return $ShowRegistro;
+        }
 
     }
 
     public function update(Request $request, $id)
     {
+      // Obtenemos los datos del token
+      $token = $request->header('token');
+
+      if ($user = JWTAuth::toUser($token))
+      {
       // Se Recibe el id del registro
       $updateRegistro = personal_information::find($id);
 
@@ -55,11 +72,16 @@ class personalController extends Controller
       $updateRegistro->save();
 
       return response()->json('Registro Actualizado Satisfactoriamente');
+      }
     }
 
 
     public function destroy(Request $request) {
+      // Obtenemos los datos del token
+      $token = $request->header('token');
 
+      if ($user = JWTAuth::toUser($token))
+      {
        // Se Recibe el id del registro
        $deleteRegistro = personal_information::where("user_id", "=", $request->get("user_id"))->first();
 
@@ -69,6 +91,6 @@ class personalController extends Controller
        // Retorna un Json
        return response()->json('Registro Eliminado Satisfactoriamente');
 
-
+         }
     }
 }
