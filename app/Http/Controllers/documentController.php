@@ -1,6 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+/*------ USE de JWT: Inicio-------- */
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
+/*------  USE de JWT: Fin -------- */
 
 use Illuminate\Http\Request;
 
