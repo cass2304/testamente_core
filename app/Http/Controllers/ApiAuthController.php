@@ -49,13 +49,11 @@ class ApiAuthController extends Controller
         if ($Findstep!=null) {
 
           return response()->json([
-              'data' => [
                   'user_id' => $ShowRegistro->id,
                   'nombre' => $ShowRegistro->name,
                   'email' => $ShowRegistro->email,
-                  'el numero del paso es' => $Findstep->step,
+                  'step_id' => $Findstep->step,
                   'token' => $token
-              ]
               ]);
         }
   }
@@ -96,7 +94,13 @@ class ApiAuthController extends Controller
 
       $Documents->save();
       $token = JWTAuth::fromUser($user);
-      return response()->json('OK, Registro realizado');
+      return response()->json([
+
+              'user_id' => $Findstep->id,
+              'nombre' => $Findstep->name,
+              'email' => $Findstep->email,
+              'token' => $token
+        ]);
 
 
 
