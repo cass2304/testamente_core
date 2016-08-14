@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use App\documents;
 use Illuminate\Support\Facades\Crypt;
+use Hash;
 
 
 class ApiAuthController extends Controller
@@ -36,14 +37,33 @@ class ApiAuthController extends Controller
         }
 
         // Si todo va bien retorna el token
-        return response()->json(compact('token'));
-    }
+        //return response()->json(compact('token'));
+        $ShowRegistro = User::where("email", "=", $request->get("email"))->first();
+        $user_id 	= array(
 
+
+           'user_id' => $ShowRegistro->id
+        );
+        $Findstep = documents::where('user_id', $user_id )->first();
+        // Se verifica si el email existe en la BD
+        if ($Findstep!=null) {
+
+          return response()->json([
+              'data' => [
+                  'user_id' => $ShowRegistro->id,
+                  'nombre' => $ShowRegistro->name,
+                  'email' => $ShowRegistro->email,
+                  'el numero del paso es' => $Findstep->step,
+                  'token' => $token
+              ]
+              ]);
+        }
+  }
 
     // Registro de Usuarios
 
     public function register(Request $request) {
-      $password = Crypt::encrypt($request->input('password'));
+      $password = Hash::make($request->input('password'));
       $credentials = array(
          'name' => $request->input('name'),
          'email' => $request->input('email'),
