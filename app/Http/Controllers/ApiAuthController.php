@@ -53,6 +53,7 @@ class ApiAuthController extends Controller
                   'nombre' => $ShowRegistro->name,
                   'email' => $ShowRegistro->email,
                   'step_id' => $Findstep->step,
+                  'id_documents' => $Findstep->id,
                   'token' => $token
               ]);
         }
