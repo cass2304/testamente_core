@@ -1,12 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
+/*------ USE de JWT: Inicio-------- */
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
+/*------  USE de JWT: Fin -------- */
 
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\personal_information;
+use App\documents;
+
 
 class personalController extends Controller
 {
@@ -20,22 +27,47 @@ class personalController extends Controller
         // Obtenemos los datos del token
         $token = $request->header('token');
 
-        if ($user = JWTAuth::toUser($token))
-         {
+       if ($user = JWTAuth::toUser($token))
+       {
            // Se crean los registros en la tabla de informacion personal
-           $newPersonal_information = personal_information::create ($request->all());
+           $user_id = $user->id;
+           $newPersonal_information = array(
+              'full_name'=> $request->input('full_name'),
+              'birth_date' => $request->input('birth_date'),
+              'birth_place' => $request->input('birth_place'),
+              'genero' => $request->input('genero'),
+              'nationality' => $request->input('nationality'),
+              'profession' => $request->input('profession'),
+              'address' => $request->input('domicilio'),
+              'mother_name' => $request->input('mother_name'),
+              'father_name' => $request->input('father_name'),
+              'identity card' => $request->input('identity card'),
+              'user_id' => $user_id,
+
+
+           );
+          $information = personal_information::create($newPersonal_information);
 
            // Se Guarda el registro en la BD
-           $newPersonal_information->save();
+           $id = $request->input('id_documents');
+           // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
+           $Findstep = documents::find($id);
+           $tep ="3";
 
-           // Verificamos que se haya credo el usuario
-           if ($newPersonal_information->save()) {
-             return response()->json(["Datos Creados Correctamente"]);
-           }
+           // Se verifica si el email existe en la BD
+            if ($Findstep!=null) {
+
+           // Si el email existe se actualiza el campo del password para ese usuario
+           $Findstep->update(['step' =>($tep)]);
+
+           // Se guarda el registro en la BD
+           $Findstep->save();
+             }
+           return response()->json(["Datos Cargados Correctamente"]);
            // Si hay un error
            return response()->json(["Error"]);
 
-         }
+        }  // Cierre del if del token
 
      }
 

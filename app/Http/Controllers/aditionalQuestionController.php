@@ -1,7 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+/*------ USE de JWT: Inicio-------- */
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
+/*------  USE de JWT: Fin -------- */
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -20,6 +24,10 @@ class aditionalQuestionController extends Controller
      public function register(Request $request) {
 
         // Obtenemos los datos del token
+        $token = $request->header('token');
+
+        if ($user = JWTAuth::toUser($token))
+         {
            $step="1";
            $id_documents=$request->get('id_documents');
 
@@ -138,7 +146,7 @@ class aditionalQuestionController extends Controller
                           $Findstep->save();
                             }
                 return response()->json(["Datos Cargados Correctamente"]);
-
+          }
         }
 
     /**
