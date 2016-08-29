@@ -5,28 +5,32 @@ use Illuminate\Database\Migrations\Migration;
 
 class UpdatePersonalInformationTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-      Schema::table('personal_information', function ($table) {
-        $table->renameColumn('firt_name', 'full_name');
-        $table->string('genero')->after('birth_place');
-        $table->renameColumn('last_name', 'birth_date');
+  /**
+  * Run the migrations.
+  *
+  * @return void
+  */
+  public function up()
+  {
+    Schema::table('personal_information', function ($table) {
+      $table->renameColumn('firt_name', 'full_name');
+      $table->string('genero')->after('birth_place');
+      $table->renameColumn('last_name', 'birth_date');
+    });
+  }
 
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        //
-    }
+  /**
+  * Reverse the migrations.
+  *
+  * @return void
+  */
+  public function down()
+  {
+    //
+    Schema::table('personal_information', function ($table) {
+      $table->renameColumn('full_name', 'firt_name');
+      $table->dropColumn('genero');
+      $table->renameColumn('birth_date', 'last_name');
+    });
+  }
 }

@@ -2,16 +2,20 @@
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+      'los roqueritos del regueaton'
+    ]);
+});
+
+Route::group(['middleware' => 'cors'], function () {
+    Route::post('/sing_in', 'ApiAuthController@userAuth'); // Autenticado de Usuario
+    Route::post('users/sing_up', 'ApiAuthController@register'); // Registro de Usuario
+    Route::post("/forgot_password", 'UserController@forgotPassword');
 });
 
 // Rutas de la API
-Route::group(['middleware' => 'cors'], function()
+Route::group(['middleware' => ['cors','jwt.auth']], function()
 {
-    Route::post('/sing_in', 'ApiAuthController@userAuth'); // Autenticado de Usuario
-
-    Route::post('users/sing_up', 'ApiAuthController@register'); // Registro de Usuario
-
     Route::post('password/new', 'ApiAuthController@NewPasswd'); // Cambio de Contraseña
 
     Route::post('/users/delete', 'ApiAuthController@delete'); // Borra el registro de la BD
@@ -22,29 +26,29 @@ Route::group(['middleware' => 'cors'], function()
 
     Route::post('/documents/show','documentController@index');    // Update de la tabla documents luego de siguiente
 
-    Route::post('/questions','aditionalQuestionController@register');   
+    Route::post('/questions','aditionalQuestionController@register');
 
     Route::group(['prefix' => 'clients'], function () {
 
-    Route::post('/info', 'personalController@register');      // Crea el registro
+      Route::post('/info', 'personalController@register');      // Crea el registro
 
-    Route::get('/show', 'personalController@show');           // Muestra El registro segun el user_id
+      Route::get('/show', 'personalController@show');           // Muestra El registro segun el user_id
 
-    Route::get('/destroy', 'personalController@destroy');     // Elimna El registro segun el user_id
+      Route::get('/destroy', 'personalController@destroy');     // Elimna El registro segun el user_id
 
-    Route::post('/update', 'personalController@update');      // Actualiza el registro
+      Route::post('/update', 'personalController@update');      // Actualiza el registro
 
     });
 
     Route::group(['prefix' => 'family'], function () {
 
-    Route::post('/info', 'familyController@register');      // Crea el registro
+      Route::post('/info', 'familyController@register');      // Crea el registro
 
-    Route::get('/show', 'familyController@show');           // Muestra El registro segun el user_id
+      Route::get('/show', 'familyController@show');           // Muestra El registro segun el user_id
 
-    Route::get('/destroy', 'familyController@destroy');     // Elimna El registro segun el user_id
+      Route::get('/destroy', 'familyController@destroy');     // Elimna El registro segun el user_id
 
-    Route::post('/update', 'familyController@update');      // Actualiza el registro
+      Route::post('/update', 'familyController@update');      // Actualiza el registro
 
 
 
