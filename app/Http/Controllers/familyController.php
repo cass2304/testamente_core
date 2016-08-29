@@ -28,17 +28,62 @@ class familyController extends Controller
       if ($user = JWTAuth::toUser($token))
       {
         // Se crean los registros en la tabla de informacion personal
-        $newFamily_information = family_information::create ($request->all());
+        $user_id = $user->id;
+        $edo_civil = $request->input('edo_civil');
+        $hijos = $request->input('hijos');
 
-        // Se Guarda el registro en la BD
-        $newFamily_information->save();
+        $FindUser = personal_information::find($user_id);
 
-        // Verificamos que se haya credo el usuario
-        if ($newFamily_information->save()) {
-          return response()->json(["Datos Creados Correctamente"]);
-        }
-        // Si hay un error
-        return response()->json(["Error"]);
+        // Se verifica si el email existe en la BD
+         if ($FindUser!=null) {
+
+        // Si el email existe se actualiza el campo del password para ese usuario
+        $FindUser->update(['civil_status' =>($edo_civil)]);
+
+        // Se guarda el registro en la BD
+         $FindUser->save();
+          {
+        if ($edo_civil=="casado"){
+          $newFamily_information = array(
+             'mate_name'=> $request->input('mate_name'),
+             'imu_data' => $request->input('imu_data'),
+             'regimen' => $request->input('regimen'),
+             'renap_data' => $request->input('renap_data'),
+             'user_id' => $user_id
+          );
+
+            $information = family_information::create($newFamily_information);
+          }
+
+          if ($hijos=="si"){
+            $FindFamily = family_information::find($user_id);
+            $child_name => $request->input('child_name'),
+            $child_birthdate => $request->input('child_birthdate'),
+            $child_nationality => $request->input('child_nationality'),
+            $child_placebirth => $request->input('child_placebirth'),
+
+            $FindFamily->update(['child_name' =>($child_name)]);
+            $FindFamily->update(['child_birthdate' =>($child_birthdate)]);
+            $FindFamily->update(['child_nationality' =>($child_nationality)]);
+            $FindFamily->update(['child_placebirth' =>($child_placebirth)]);
+
+            $FindFamily->save();
+          }
+          $id = $request->input('id_documents');
+          // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
+          $Findstep = documents::find($id);
+          $tep ="4";
+
+          // Se verifica si el email existe en la BD
+           if ($Findstep!=null) {
+
+          // Si el email existe se actualiza el campo del password para ese usuario
+          $Findstep->update(['step' =>($tep)]);
+
+          // Se guarda el registro en la BD
+          $Findstep->save();
+           return response()->json(["Datos Cargados Correctamente"]);
+
      }
 
     }

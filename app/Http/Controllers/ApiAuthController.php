@@ -52,8 +52,8 @@ class ApiAuthController extends Controller
                   'user_id' => $ShowRegistro->id,
                   'nombre' => $ShowRegistro->name,
                   'email' => $ShowRegistro->email,
-                  'step_id' => $Findstep->step,
                   'id_documents' => $Findstep->id,
+                  'step_id' => $Findstep->step,
                   'token' => $token
               ]);
         }
@@ -100,6 +100,7 @@ class ApiAuthController extends Controller
               'user_id' => $Findstep->id,
               'nombre' => $Findstep->name,
               'email' => $Findstep->email,
+              'id_documents' => $Documents->id,
               'token' => $token
         ]);
 
