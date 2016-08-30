@@ -7,15 +7,19 @@ Route::get('/', function () {
     ]);
 });
 
-Route::group(['middleware' => 'cors'], function () {
+/*Route::group(['middleware' => 'cors'], function () {
     Route::post('/sing_in', 'ApiAuthController@userAuth'); // Autenticado de Usuario
     Route::post('users/sing_up', 'ApiAuthController@register'); // Registro de Usuario
     Route::post("/forgot_password", 'UserController@forgotPassword');
-});
+});*/
 
 // Rutas de la API
-Route::group(['middleware' => ['cors','jwt.auth']], function()
+Route::group(['middleware' => 'cors'], function()
 {
+    Route::post('/sing_in', 'ApiAuthController@userAuth'); // Autenticado de Usuario
+    Route::post('users/sing_up', 'ApiAuthController@register'); // Registro de Usuario
+    Route::post("/forgot_password", 'UserController@forgotPassword');
+
     Route::post('password/new', 'ApiAuthController@NewPasswd'); // Cambio de Contraseña
 
     Route::post('/users/delete', 'ApiAuthController@delete'); // Borra el registro de la BD
