@@ -23,10 +23,9 @@ class aditionalQuestionController extends Controller
      */
      public function register(Request $request) {
 
-        // Obtenemos los datos del token
-        $token = $request->header('token');
+       $user = JWTAuth::parseToken()->authenticate();
 
-        if ($user = JWTAuth::toUser($token))
+        if ($user)
          {
            $step="1";
            $id_documents=$request->get('id_documents');

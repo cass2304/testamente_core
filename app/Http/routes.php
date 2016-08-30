@@ -6,7 +6,7 @@ Route::get('/', function () {
 });
 
 // Rutas de la API
-Route::group(['middleware' => 'cors'], function()
+Route::group(['middleware' => ['cors','jwt.auth']], function()
 {
     Route::post('/sing_in', 'ApiAuthController@userAuth'); // Autenticado de Usuario
 
@@ -22,7 +22,7 @@ Route::group(['middleware' => 'cors'], function()
 
     Route::post('/documents/show','documentController@index');    // Update de la tabla documents luego de siguiente
 
-    Route::post('/questions','aditionalQuestionController@register');   
+    Route::post('/questions','aditionalQuestionController@register');
 
     Route::group(['prefix' => 'clients'], function () {
 
