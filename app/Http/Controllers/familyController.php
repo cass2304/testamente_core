@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\personal_information;
+use App\documents;
 use App\family_information;
 
 class familyController extends Controller
@@ -20,47 +22,112 @@ class familyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-        public function register(Request $request) {
+    public function register(Request $request) {
 
-      // Obtenemos los datos del token
-      $token = $request->header('token');
+        if(!$user = JWTAuth::parseToken()->authenticate()){
+            return false;
+        }
 
-      if ($user = JWTAuth::toUser($token))
-      {
-        // Se crean los registros en la tabla de informacion personal
         $user_id = $user->id;
-        $edo_civil = $request->input('edo_civil');
-        $hijos = $request->input('hijos');
+        $civil_status = $request->input('civil_status');
 
-        $FindUser = personal_information::find($user_id);
+        $children = $request->input('children');
 
-        // Se verifica si el email existe en la BD
-         if ($FindUser!=null) {
+        $findUser = personal_information::find($user_id);
+        if(!$findUser){
+            return response()->json(["user_id_not_found"]);
+        }
+        if($findUser){
 
-        // Si el email existe se actualiza el campo del password para ese usuario
-        $FindUser->update(['civil_status' =>($edo_civil)]);
+            $findUser->update(['civil_status' =>($civil_status)]);
 
-        // Se guarda el registro en la BD
-         $FindUser->save();
-          {
-        if ($edo_civil=="casado"){
-          $newFamily_information = array(
-             'mate_name'=> $request->input('mate_name'),
-             'imu_data' => $request->input('imu_data'),
-             'regimen' => $request->input('regimen'),
-             'renap_data' => $request->input('renap_data'),
-             'user_id' => $user_id
-          );
+            if(!$findUser->save()){
+                return response()->json(["error_in_civil_status"]);
+            }
+        }
 
-            $information = family_information::create($newFamily_information);
-          }
 
-          if ($hijos=="si"){
-            $FindFamily = family_information::find($user_id);
-            $child_name => $request->input('child_name'),
-            $child_birthdate => $request->input('child_birthdate'),
-            $child_nationality => $request->input('child_nationality'),
-            $child_placebirth => $request->input('child_placebirth'),
+        if(count($children) > 0){
+            foreach ($children as $list){
+                $family = new family_information();
+                $family->mate_name = $request->mate_name;
+                $family->imu_data = $request->imu_data;
+                $family->regimen = $request->regimen;
+                $family->child_name = $list['name'];
+                $family->child_nationality = $list['child_nationality'];
+                $family->child_birthdate = $list['child_birthdate'];
+                $family->renap_data = $list['renap_data'];
+                $family->user_id = $user_id;
+
+                if(!$family->save()){
+                    return response()->json(["Error"]);
+                }
+
+            }
+
+        }else{
+
+            $family = new family_information();
+
+            $family->mate_name = $request->mate_name;
+            $family->imu_data = $request->imu_data;
+            $family->regimen = $request->regimen;
+            $family->user_id = $user_id;
+
+            if(!$family->save()){
+                return response()->json(["Error"]);
+            }
+
+        }
+
+        $findStep = documents::find($request->id_documents);
+
+        $findStep->update(['step' =>("4")]);
+
+        $findStep->save();
+
+        return response()->json('OK');
+
+
+        /*// Obtenemos los datos del token
+        $token = $request->header('token');
+
+        if ($user = JWTAuth::toUser($token))
+        {
+            // Se crean los registros en la tabla de informacion personal
+            $user_id = $user->id;
+            $edo_civil = $request->input('edo_civil');
+            $hijos = $request->input('hijos');
+
+            $FindUser = personal_information::find($user_id);
+
+            // Se verifica si el email existe en la BD
+            if ($FindUser!=null) {
+
+                // Si el email existe se actualiza el campo del password para ese usuario
+                $FindUser->update(['civil_status' =>($edo_civil)]);
+
+                // Se guarda el registro en la BD
+                $FindUser->save();
+                {
+                    if ($edo_civil=="casado"){
+                        $newFamily_information = array(
+                            'mate_name'=> $request->input('mate_name'),
+                            'imu_data' => $request->input('imu_data'),
+                            'regimen' => $request->input('regimen'),
+                            'renap_data' => $request->input('renap_data'),
+                            'user_id' => $user_id
+                        );
+
+                        $information = family_information::create($newFamily_information);
+                    }
+
+                    if ($hijos=="si"){
+                        $FindFamily = family_information::find($user_id);
+                        $child_name = $request->input('child_name');
+            $child_birthdate = $request->input('child_birthdate');
+            $child_nationality = $request->input('child_nationality');
+            $child_placebirth = $request->input('child_placebirth');
 
             $FindFamily->update(['child_name' =>($child_name)]);
             $FindFamily->update(['child_birthdate' =>($child_birthdate)]);
@@ -69,82 +136,85 @@ class familyController extends Controller
 
             $FindFamily->save();
           }
-          $id = $request->input('id_documents');
-          // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
-          $Findstep = documents::find($id);
-          $tep ="4";
+                    $id = $request->input('id_documents');
+                    // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
+                    $Findstep = documents::find($id);
+                    $tep ="4";
 
-          // Se verifica si el email existe en la BD
-           if ($Findstep!=null) {
+                    // Se verifica si el email existe en la BD
+                    if ($Findstep!=null) {
 
-          // Si el email existe se actualiza el campo del password para ese usuario
-          $Findstep->update(['step' =>($tep)]);
+                        // Si el email existe se actualiza el campo del password para ese usuario
+                        $Findstep->update(['step' =>($tep)]);
 
-          // Se guarda el registro en la BD
-          $Findstep->save();
-           return response()->json(["Datos Cargados Correctamente"]);
+                        // Se guarda el registro en la BD
+                        $Findstep->save();
+                        return response()->json(["Datos Cargados Correctamente"]);
 
-     }
+                    }
 
+                }
+            }
+        }*/
     }
 
     public function show(Request $request)
     {
-      // Obtenemos los datos del token
-      $token = $request->header('token');
+        // Obtenemos los datos del token
+        $token = $request->header('token');
 
-      if ($user = JWTAuth::toUser($token))
-      {
-        // Se Recibe el user_id del registro
-        $ShowRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
+        if ($user = JWTAuth::toUser($token))
+        {
+            // Se Recibe el user_id del registro
+            $ShowRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
 
-        // Muestra el registro segun el user_id
-        return $ShowRegistro;
-      }
+            // Muestra el registro segun el user_id
+            return $ShowRegistro;
+        }
     }
 
     public function destroy(Request $request) {
-      // Obtenemos los datos del token
-      $token = $request->header('token');
+        // Obtenemos los datos del token
+        $token = $request->header('token');
 
-      if ($user = JWTAuth::toUser($token))
-      {
-         // Se Recibe el id del registro
-         $deleteRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
+        if ($user = JWTAuth::toUser($token))
+        {
+            // Se Recibe el id del registro
+            $deleteRegistro = family_information::where("user_id", "=", $request->get("user_id"))->first();
 
-         // Se Elimina el registro de la BD
-         $deleteRegistro->delete();
+            // Se Elimina el registro de la BD
+            $deleteRegistro->delete();
 
-         // Retorna un Json
-         return response()->json('Registro Eliminado Satisfactoriamente');
-       }
+            // Retorna un Json
+            return response()->json('Registro Eliminado Satisfactoriamente');
+        }
     }
 
     public function update(Request $request)
     {
-      $token = $request->header('token');
+        $token = $request->header('token');
 
-      if ($user = JWTAuth::toUser($token))
-      {
-        $userid = $request->get('user_id');
+        if ($user = JWTAuth::toUser($token))
+        {
+            $userid = $request->get('user_id');
 
-        $family_information = family_information::where('user_id', $userid )->first();
+            $family_information = family_information::where('user_id', $userid )->first();
 
-        // Se verifica si el user_id existe en la tabla
+            // Se verifica si el user_id existe en la tabla
 
-         if ($family_information!=null) {
+            if ($family_information!=null) {
 
-        // Si el email existe se actualiza el campo del password para ese usuario
-            $family_information->update($request->all());
+                // Si el email existe se actualiza el campo del password para ese usuario
+                $family_information->update($request->all());
 
-        // Se guarda el registro en la BD
-            $family_information->save();
+                // Se guarda el registro en la BD
+                $family_information->save();
 
-        // Retorna un Json
+                // Retorna un Json
 
-            return response()->json('OK, Registro Update');
-    }
-      }
+                return response()->json('OK, Registro Update');
+            }
+        }
     }
 
 

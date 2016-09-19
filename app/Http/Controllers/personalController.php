@@ -25,12 +25,11 @@ class personalController extends Controller
      public function register(Request $request) {
 
         // Obtenemos los datos del token
-        $token = $request->header('token');
+        //$token = $request->header('token');
 
-       if ($user = JWTAuth::toUser($token))
+       if ($user = JWTAuth::parseToken()->authenticate())
        {
            // Se crean los registros en la tabla de informacion personal
-           $user_id = $user->id;
            $newPersonal_information = array(
               'full_name'=> $request->input('full_name'),
               'birth_date' => $request->input('birth_date'),
@@ -38,37 +37,29 @@ class personalController extends Controller
               'genero' => $request->input('genero'),
               'nationality' => $request->input('nationality'),
               'profession' => $request->input('profession'),
-              'address' => $request->input('domicilio'),
+              'address' => $request->input('address'),
               'mother_name' => $request->input('mother_name'),
               'father_name' => $request->input('father_name'),
               'identity card' => $request->input('identity card'),
-              'user_id' => $user_id,
-
-
+              'user_id' => $user->id
            );
+
           $information = personal_information::create($newPersonal_information);
 
-           // Se Guarda el registro en la BD
-           $id = $request->input('id_documents');
-           // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
-           $Findstep = documents::find($id);
-           $tep ="3";
+           $documents = $request->input('id_documents');
 
-           // Se verifica si el email existe en la BD
-            if ($Findstep!=null) {
+           $finStep = documents::find($documents);
 
-           // Si el email existe se actualiza el campo del password para ese usuario
-           $Findstep->update(['step' =>($tep)]);
+            if ($finStep!=null) {
 
-           // Se guarda el registro en la BD
-           $Findstep->save();
+                $finStep->update(['step' =>("3")]);
+
+                $finStep->save();
              }
            return response()->json(["Datos Cargados Correctamente"]);
            // Si hay un error
-           return response()->json(["Error"]);
-
         }  // Cierre del if del token
-
+         return response()->json(["Error"]);
      }
 
     public function show(Request $request)

@@ -28,7 +28,7 @@ Route::group(['middleware' => ['cors','jwt.auth']], function()
 
     Route::group(['prefix' => 'clients'], function () {
 
-    Route::post('/info', 'personalController@register');      // Crea el registro
+    Route::post('/personalInfo', 'personalController@register');      // Crea el registro
 
     Route::get('/show', 'personalController@show');           // Muestra El registro segun el user_id
 
