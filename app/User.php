@@ -2,26 +2,16 @@
 
 namespace App;
 
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Model implements AuthenticatableContract,
-                                    AuthorizableContract,
-                                    CanResetPasswordContract
+class User extends Authenticatable
 {
-    use Authenticatable, Authorizable, CanResetPassword;
-
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'tbl_users';
 
     /**
      * The attributes that are mass assignable.
@@ -31,30 +21,12 @@ class User extends Model implements AuthenticatableContract,
     protected $fillable = ['name', 'email', 'password'];
 
     /**
-     * The attributes excluded from the model's JSON form.
+     * The attributes that should be hidden for arrays.
      *
      * @var array
      */
-   // protected $hidden = ['password', 'remember_token'];
-    protected $hidden = ['remember_token'];
-
-    public function personal_information(){
-    	return $this->hasOne('\App\personal_information');
-   	}
-
-    public function family_information(){
-    	return $this->hasMany('\App\family_information');
-   	}
-
-    public function beneficiary(){
-    	return $this->hasMany('\App\beneficiary');
-   	}
-
-    public function property(){
-    	return $this->hasMany('\App\property');
-   	}
-
-    public function location(){
-    	return $this->hasOne('\App\location');
-   	}
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+    public $timestamps = false;
 }
