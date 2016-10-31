@@ -52,5 +52,19 @@ Route::group(['middleware' => ['cors','jwt.auth']], function()
 
     });
 
+    Route::group(['prefix' => 'property'], function () {
+
+        Route::post('/create', 'propertyController@create');      // Crea el registro
+
+        Route::get('/show', 'familyController@show');           // Muestra El registro segun el user_id
+
+        Route::get('/destroy', 'familyController@destroy');     // Elimna El registro segun el user_id
+
+        Route::post('/update', 'familyController@update');      // Actualiza el registro
+
+
+
+    });
+
 
 });
