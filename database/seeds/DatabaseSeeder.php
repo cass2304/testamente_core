@@ -15,12 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        DB::table('users')->delete();
+        DB::table('tbl_users')->delete();
 
         $users = array(
-                ['name' => 'John Salazar', 'email' => 'johnmsalazar@gmail.com', 'password' => Hash::make('juan316')],
-                ['name' => 'Carlos Martinez', 'email' => 'cmartinez@gmail.com', 'password' => Hash::make('mueble')],
-                
+                ['name' => 'cesar salazar', 'email' => 'cesar.augs@gmail.com', 'password' => Hash::make('holamundo')]
         );
             
         // Loop through each user above and create the record for them in the database

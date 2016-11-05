@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\User;
-use App\documents;
+use App\Document;
 use Illuminate\Support\Facades\Crypt;
 use Hash;
 
@@ -44,19 +44,19 @@ class ApiAuthController extends Controller
 
            'user_id' => $ShowRegistro->id
         );
-        $Findstep = documents::where('user_id', $user_id )->first();
+        $Findstep = Document::where('user_id', $user_id )->first();
         // Se verifica si el email existe en la BD
-        if ($Findstep!=null) {
+        //if ($Findstep!=null) {
 
           return response()->json([
                   'user_id' => $ShowRegistro->id,
                   'nombre' => $ShowRegistro->name,
                   'email' => $ShowRegistro->email,
-                  'id_documents' => $Findstep->id,
-                  'step_id' => $Findstep->step,
+                  //'id_documents' => $Findstep->id,
+                  //'step_id' => $Findstep->step,
                   'token' => $token
               ]);
-        }
+        //}
   }
 
     // Registro de Usuarios
