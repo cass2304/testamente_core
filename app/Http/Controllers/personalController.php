@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 /*------ USE de JWT: Inicio-------- */
+use App\Pregunta;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -12,7 +13,13 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\personal_information;
-use App\documents;
+use App\Document;
+use App\Respuesta;
+use App\RespuestaDetalle;
+use App\RespuestaHijos;
+use App\RespuestaActivos;
+use App\RespuestaFinanciero;
+use App\RespuestaPropiedad;
 
 
 class personalController extends Controller
@@ -22,98 +29,237 @@ class personalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-     public function register(Request $request) {
-
+    public function register(Request $request) {
         // Obtenemos los datos del token
-        //$token = $request->header('token');
+        $token = $request->header('Authorization');
 
-       if ($user = JWTAuth::parseToken()->authenticate())
-       {
-           // Se crean los registros en la tabla de informacion personal
-           $newPersonal_information = array(
-              'full_name'=> $request->input('full_name'),
-              'birth_date' => $request->input('birth_date'),
-              'birth_place' => $request->input('birth_place'),
-              'genero' => $request->input('genero'),
-              'nationality' => $request->input('nationality'),
-              'profession' => $request->input('profession'),
-              'address' => $request->input('address'),
-              'mother_name' => $request->input('mother_name'),
-              'father_name' => $request->input('father_name'),
-              'identity card' => $request->input('identity card'),
-              'user_id' => $user->id
-           );
 
-          $information = personal_information::create($newPersonal_information);
+        $user = JWTAuth::parseToken()
+            ->authenticate()
+            ->join('tbl_documents','tbl_users.id','=','tbl_documents.user_id')
+            ->find(JWTAuth::parseToken()->authenticate()->id);
 
-           $documents = $request->input('id_documents');
+        if(count($user->toArray()) == 0){
+            return response()->json(["Error"],401);
+        }
 
-           $finStep = documents::find($documents);
 
-            if ($finStep!=null) {
+        foreach ($request->all() as $answer){
 
-                $finStep->update(['step' =>("3")]);
+            $answerToSave = new Respuesta();
 
-                $finStep->save();
-             }
-           return response()->json(["Datos Cargados Correctamente"]);
-           // Si hay un error
-        }  // Cierre del if del token
-         return response()->json(["Error"]);
-     }
+            $answerToSave->ID_documento = $user['document_id'];
+            $answerToSave->ID_pregunta = $answer['ID'];
+            $answerToSave->respuesta = $answer['respuesta'];
 
-    public function show(Request $request)
+            if(!$answerToSave->save()){
+                return response()->json(["Error_saving_detail"],401);
+            }
+
+            switch($user['step']){
+
+                case 3:
+
+                    if(count($answer['detalle'])>0){
+
+                        foreach($answer['detalle'] as $detalle){
+
+                            $detail = new RespuestaHijos();
+                            $detail->ID_documento = $user['document_id'];
+                            $detail->nombre =  $detalle['nombre'];
+                            $detail->genero = $detalle['genero'];
+                            $detail->fecha_nacimiento = $detalle['fecha_nacimiento'];
+                            $detail->lugar = $detalle['lugar'];
+                            $detail->departamento = $detalle['departamento'];
+                            $detail->inscripcion_renap = $detalle['inscripcion_renap'];
+                            $detail->nose_renap = $detalle['nose_renap'];
+
+                            if(!$detail->save()){
+                                return response()->json(["Error_saving_detail"],401);
+                            }
+
+                        }
+                    }
+
+                case 4:
+
+                    if(count($answer['propiedad'])>0){
+
+                        foreach($answer['propiedad'] as $detalle){
+
+                            $detail = new RespuestaPropiedad();
+                            $detail->ID_documento = $user['document_id'];
+                            $detail->pais =  $detalle['pais'];
+                            $detail->domicilio = $detalle['domicilio'];
+                            $detail->nro_finca = $detalle['nro_finca'];
+                            $detail->nro_folio = $detalle['nro_folio'];
+                            $detail->nro_libro = $detalle['nro_libro'];
+
+                            if(!$detail->save()){
+                                return response()->json(["Error_saving_detail_propiedad"],401);
+                            }
+
+                        }
+                    }
+
+                    if(count($answer['financiero'])>0){
+
+                        foreach($answer['financiero'] as $detalle){
+
+                            $detail = new RespuestaFinanciero();
+                            $detail->ID_documento = $user['document_id'];
+                            $detail->producto_financiero = $detalle['producto_financiero'];
+                            $detail->tiene_beneficiario =  $detalle['tiene_beneficiario'];
+                            $detail->porcentaje = $detalle['porcentaje'];
+                            $detail->cambiar_beneficiario = $detalle['cambiar_beneficiario'];
+                            $detail->beneficiario = $detalle['beneficiario'];
+
+                            if(!$detail->save()){
+                                return response()->json(["Error_saving_detail_propiedad"],401);
+                            }
+
+                        }
+                    }
+
+                case 5:
+
+                    if(count($answer['activos'])>0){
+
+                        foreach($answer['activos'] as $detalle){
+
+                            $detail = new RespuestaActivos();
+                            $detail->ID_documento = $user['document_id'];
+                            $detail->activo =  $detalle['activo'];
+                            $detail->monto = $detalle['monto'];
+                            $detail->beneficiario = $detalle['beneficiario'];
+
+                            if(!$detail->save()){
+                                return response()->json(["Error_saving_detail_propiedad"],401);
+                            }
+
+                        }
+                    }
+
+
+
+                default:
+
+                    if(count($answer['detalle'])>0){
+                        foreach($answer['detalle'] as $detalle){
+
+                            $detail = new RespuestaDetalle();
+                            $detail->ID_respuesta = $answerToSave->ID;
+                            $detail->label =  $detalle['label'];
+                            $detail->respuesta = $detalle['value'];
+
+                            if(!$detail->save()){
+                                return response()->json(["Error_saving_detail"],401);
+                            }
+
+                        }
+                    }
+
+            }
+
+        }
+
+        $updateStep = Document::find($user['document_id']);
+
+        if(!$updateStep){
+            return response()->json(['error' => 'not_found_document'], 401);
+        }
+
+        $step = $user['step'] + 1;
+
+        $updateStep->update(['step' =>($step)]);
+
+        $updateStep->save();
+
+        return response()->json(array('success' => 'OK'), 200);
+
+    }
+
+    public function getQuestions(Request $request)
     {
-      // Obtenemos los datos del token
-      $token = $request->header('token');
+        if(!$user = JWTAuth::parseToken()->authenticate()){
+            return response()->json(["Error"]);
+        }
 
-      if ($user = JWTAuth::toUser($token))
-      {
+        if(!$request->step || !$request->user_id){
+            return response()->json(['error' => 'user_id or step is required'], 401);
+        }
 
-      // Se Recibe el user_id del registro
-      $ShowRegistro = personal_information::where("user_id", "=", $request->get("user_id"))->first();
+        $getInfo = Pregunta::where('paso','=',$request->step)->get();
 
-      // Muestra el registro segun el user_id
-      return $ShowRegistro;
+        $response = array();
+
+        if($getInfo){
+
+            foreach ($getInfo as $value){
+
+                //var_dump($value['nro_pregunta']);
+
+               /* $answer = array(
+                    'pregunta' => $value['nro_pregunta'],
+                    'detalle' => array(
+                        'ID' => $value['ID'],
+                        'sub_pregunta'=> $value['sub_pregunta']
+                    )
+                );
+                array_push($response, $answer);*/
+
+                //-------------------------
+                if($value['sub_pregunta']== null) $value['sub_pregunta'] = 0;
+                if(!isset($response[$value['nro_pregunta']])) $response[$value['nro_pregunta']] = array();
+                $objTMP = array('ID' => $value['ID'],
+                    'sub_pregunta'=> $value['sub_pregunta']);
+
+                array_push($response[$value['nro_pregunta']], $objTMP);
+
+
+            }
+
+            return response()->json($response);
+
         }
 
     }
 
     public function update(Request $request, $id)
     {
-      // Obtenemos los datos del token
-      $token = $request->header('token');
+        // Obtenemos los datos del token
+        $token = $request->header('token');
 
-      if ($user = JWTAuth::toUser($token))
-      {
-      // Se Recibe el id del registro
-      $updateRegistro = personal_information::find($id);
+        if ($user = JWTAuth::toUser($token))
+        {
+            // Se Recibe el id del registro
+            $updateRegistro = personal_information::find($id);
 
-      // Se actualiza el registro
-      $updateRegistro->fill($request->all());
+            // Se actualiza el registro
+            $updateRegistro->fill($request->all());
 
-      $updateRegistro->save();
+            $updateRegistro->save();
 
-      return response()->json('Registro Actualizado Satisfactoriamente');
-      }
+            return response()->json('Registro Actualizado Satisfactoriamente');
+        }
     }
 
 
     public function destroy(Request $request) {
-      // Obtenemos los datos del token
-      $token = $request->header('token');
+        // Obtenemos los datos del token
+        $token = $request->header('token');
 
-      if ($user = JWTAuth::toUser($token))
-      {
-       // Se Recibe el id del registro
-       $deleteRegistro = personal_information::where("user_id", "=", $request->get("user_id"))->first();
+        if ($user = JWTAuth::toUser($token))
+        {
+            // Se Recibe el id del registro
+            $deleteRegistro = personal_information::where("user_id", "=", $request->get("user_id"))->first();
 
-       // Se Elimina el registro de la BD
-       $deleteRegistro->delete();
+            // Se Elimina el registro de la BD
+            $deleteRegistro->delete();
 
-       // Retorna un Json
-       return response()->json('Registro Eliminado Satisfactoriamente');
+            // Retorna un Json
+            return response()->json('Registro Eliminado Satisfactoriamente');
 
-         }
+        }
     }
 }

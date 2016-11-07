@@ -36,103 +36,102 @@ class ApiAuthController extends Controller
             return response()->json(['error' => 'No se pudo crear el Token'], 500);
         }
 
-        // Si todo va bien retorna el token
-        //return response()->json(compact('token'));
         $ShowRegistro = User::where("email", "=", $request->get("email"))->first();
         $user_id 	= array(
 
-
-           'user_id' => $ShowRegistro->id
+            'user_id' => $ShowRegistro->id
         );
         $Findstep = Document::where('user_id', $user_id )->first();
-        // Se verifica si el email existe en la BD
+
         //if ($Findstep!=null) {
 
-          return response()->json([
-                  'user_id' => $ShowRegistro->id,
-                  'nombre' => $ShowRegistro->name,
-                  'email' => $ShowRegistro->email,
-                  //'id_documents' => $Findstep->id,
-                  //'step_id' => $Findstep->step,
-                  'token' => $token
-              ]);
+        return response()->json([
+            'user_id' => $ShowRegistro->id,
+            'nombre' => $ShowRegistro->name,
+            'email' => $ShowRegistro->email,
+            'document_id' => $Findstep->document_id,
+            'step' => $Findstep->step,
+            'token' => $token
+        ]);
         //}
-  }
+    }
 
     // Registro de Usuarios
 
     public function register(Request $request) {
-      $password = Hash::make($request->input('password'));
-      $credentials = array(
-         'name' => $request->input('name'),
-         'email' => $request->input('email'),
-         'password' => $password,
-      );
 
-      $email 	= array(
+        $password = Hash::make($request->input('password'));
+        $credentials = array(
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => $password,
+        );
 
-         'email' => $request->input('email'),
+        $email 	= array(
 
-      );
-      $Findemail = User::where('email', $email )->first();
-      if ($Findemail) {
-          return response()->json(['error' => 'EL Usuario ya esta rgistrado.'], 401);
-      }
-      $user = User::create($credentials);
-      $email 	= array(
+            'email' => $request->input('email'),
 
-         'email' => $request->input('email'),
+        );
 
-      );
-      $Findstep = User::where('email', $email )->first();
-      // Se verifica si el email existe en la BD
-       if ($Findstep!=null) {
-          $step = "1";
-      // Se llena la tabla documents con los primeros registros
-      $Documents = new documents;
-      $Documents ->user_id = $Findstep->id;
-      $Documents ->step = $step;
+        $emaiInfo = User::where('email', $email )->first();
 
-      $Documents->save();
-      $token = JWTAuth::fromUser($user);
-      return response()->json([
+        if ($emaiInfo) {
+            return response()->json(['error' => 'EL Usuario ya esta registrado.'], 401);
+        }
 
-              'user_id' => $Findstep->id,
-              'nombre' => $Findstep->name,
-              'email' => $Findstep->email,
-              'id_documents' => $Documents->id,
-              'token' => $token
-        ]);
+        $user = User::create($credentials);
+        $email 	= array(
 
+            'email' => $request->input('email'),
 
+        );
 
-  }
-      }
+        $findStep = User::where('email', $email )->first();
+        // Se verifica si el email existe en la BD
+        if ($findStep!=null) {
+            $step = "1";
+            // Se llena la tabla documents con los primeros registros
+
+            $Documents = new document;
+            $Documents ->user_id = $findStep->id;
+            $Documents ->step = $step;
+            $Documents->save();
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'user_id' => $findStep->id,
+                'nombre' => $findStep->name,
+                'email' => $findStep->email,
+                'id_documents' => $Documents->document_id,
+                'token' => $token
+            ]);
+
+        }
+    }
 
     // Cambio de contraseña
 
-      public function NewPasswd(Request $request) {
+    public function NewPasswd(Request $request) {
 
         $token = $request->header('token');
 
         if ($user = JWTAuth::toUser($token))
 
-         {
+        {
             $email= $request->input("email");
-           // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
-           $FindUser = User::where("email", "=", $email )->first();
+            // Se le solicita al usuario el correo electronico y luego se buscan los demas registros en la BD
+            $FindUser = User::where("email", "=", $email )->first();
 
-           // Se verifica si el email existe en la BD
+            // Se verifica si el email existe en la BD
             if ($FindUser!=null) {
 
-           // Si el email existe se actualiza el campo del password para ese usuario
-               $FindUser->update(['password' => bcrypt($request->input("password"))]);
+                // Si el email existe se actualiza el campo del password para ese usuario
+                $FindUser->update(['password' => bcrypt($request->input("password"))]);
 
-           // Se guarda el registro en la BD
-               $FindUser->save();
+                // Se guarda el registro en la BD
+                $FindUser->save();
 
-           // Retorna un Json con el usuario que actualizo el password
-               return response()->json($FindUser);
+                // Retorna un Json con el usuario que actualizo el password
+                return response()->json($FindUser);
             }
         }
 
@@ -140,19 +139,19 @@ class ApiAuthController extends Controller
 
     public function index(Request $request)
     {
-         // Obtenemos los datos del Login
+        // Obtenemos los datos del Login
         $credentials = $request->only('email', 'password');
         $token = null;
 
         // Se verifica si hay un token
-         if ($token = JWTAuth::attempt($credentials))
-          {
-              // Si las credenciales existen Retorna un Json con la lista de usuarios del modelo User
-              return response()->json(User::all());
-          }
+        if ($token = JWTAuth::attempt($credentials))
+        {
+            // Si las credenciales existen Retorna un Json con la lista de usuarios del modelo User
+            return response()->json(User::all());
+        }
 
-          //  Si no existen las credenciales se muestra un error
-              return response()->json(['error' => 'Usuario o Clave invalidos'], 401);
+        //  Si no existen las credenciales se muestra un error
+        return response()->json(['error' => 'Usuario o Clave invalidos'], 401);
     }
 
 }
