@@ -140,8 +140,6 @@ class personalController extends Controller
                         }
                     }
 
-
-
                 default:
 
                     if(count($answer['detalle'])>0){
