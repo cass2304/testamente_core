@@ -43,14 +43,23 @@ class ApiAuthController extends Controller
         );
         $Findstep = Document::where('user_id', $user_id )->first();
 
+        if(!$Findstep){
+            $document = '';
+            $step = '1';
+        }else{
+            $document = $Findstep->document_id;
+            $step = $Findstep->step;
+
+        }
+
         //if ($Findstep!=null) {
 
         return response()->json([
             'user_id' => $ShowRegistro->id,
             'nombre' => $ShowRegistro->name,
             'email' => $ShowRegistro->email,
-            'document_id' => $Findstep->document_id,
-            'step' => $Findstep->step,
+            'document_id' => $document,
+            'step' => $step,
             'token' => $token
         ]);
         //}
