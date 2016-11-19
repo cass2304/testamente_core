@@ -13,6 +13,7 @@ class RespuestaActivos extends Model
       'ID_documento',
       'activo',
       'monto',
-      'beneficiario'
+      'beneficiario',
+      'porcentaje'
   ];
 }

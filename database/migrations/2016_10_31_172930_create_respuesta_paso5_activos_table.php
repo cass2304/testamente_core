@@ -18,6 +18,7 @@ class CreateRespuestaPaso5ActivosTable extends Migration
           $table->string('activo')->nullable();
           $table->decimal('monto', 5, 2)->nullable();
           $table->string('beneficiario')->nullable();
+          $table->string('porcentaje')->nullable();
         });
     }
 
