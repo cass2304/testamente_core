@@ -126,15 +126,16 @@ class personalController extends Controller
 
                 case 5:
 
-                    if(count($answer['activos'])>0){
+                    if(count($answer['detalle'])>0){
 
-                        foreach($answer['activos'] as $detalle){
+                        foreach($answer['detalle'] as $detalle){
 
                             $detail = new RespuestaActivos();
                             $detail->ID_documento = $user['document_id'];
                             $detail->activo =  $detalle['activo'];
                             $detail->monto = $detalle['monto'];
                             $detail->beneficiario = $detalle['beneficiario'];
+                            $detail->porcentaje = $detalle['porcentaje'];
 
                             if(!$detail->save()){
                                 return response()->json(["Error_saving_detail_propiedad"],401);
