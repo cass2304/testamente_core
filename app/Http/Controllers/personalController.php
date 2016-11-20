@@ -85,7 +85,7 @@ class personalController extends Controller
 
                 case 4:
 
-                    if(count($answer['propiedad'])>0){
+                    if(isset($answer['propiedad'])){
 
                         foreach($answer['propiedad'] as $detalle){
 
@@ -104,7 +104,7 @@ class personalController extends Controller
                         }
                     }
 
-                    if(count($answer['financiero'])>0){
+                    if(isset($answer['financiero'])){
 
                         foreach($answer['financiero'] as $detalle){
 
@@ -143,6 +143,7 @@ class personalController extends Controller
 
                         }
                     }
+                break;
 
                 default:
 
