@@ -57,7 +57,7 @@ class personalController extends Controller
             }
 
 
-            switch($user['step']){
+            switch(intval($user['step'])){
 
                 case 3:
 
