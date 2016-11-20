@@ -173,7 +173,7 @@ class personalController extends Controller
 
         $updateStep->save();
 
-        return response()->json(array('success' => 'OK'), 200);
+        return response()->json('Next_step');
 
     }
 
