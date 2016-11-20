@@ -56,6 +56,7 @@ class personalController extends Controller
                 return response()->json(["Error_saving_detail"],401);
             }
 
+
             switch($user['step']){
 
                 case 3:
@@ -80,6 +81,7 @@ class personalController extends Controller
 
                         }
                     }
+                break;
 
                 case 4:
 
@@ -120,6 +122,7 @@ class personalController extends Controller
 
                         }
                     }
+                break;
 
                 case 5:
 
@@ -156,7 +159,7 @@ class personalController extends Controller
 
                         }
                     }
-
+                break;
             }
 
         }
