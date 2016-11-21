@@ -20,6 +20,7 @@ use App\RespuestaHijos;
 use App\RespuestaActivos;
 use App\RespuestaFinanciero;
 use App\RespuestaPropiedad;
+use DB;
 
 
 class personalController extends Controller
@@ -247,6 +248,106 @@ class personalController extends Controller
         }
     }
 
+    public function getDocument(Request $request) {
+
+
+        $user = JWTAuth::parseToken()
+            ->authenticate()
+            ->join('tbl_documents','tbl_users.id','=','tbl_documents.user_id')
+            ->find(JWTAuth::parseToken()->authenticate()->id);
+
+
+        $user->toArray();
+
+        if(count($user->toArray()) == 0){
+            return response()->json(["Error"],401);
+        }
+
+        //die(var_dump($user->document_id));
+
+        //fill  part one
+        $data_1 = DB::select('SELECT A.pregunta, B.respuesta
+                                From tbl_preguntas A
+                                LEFT JOIN tbl_respuestas B on A.ID = B.ID_pregunta AND B.ID_documento ='. $user->document_id .'
+                                WHERE A.paso = 2');
+
+        $respuesta1 = array();
+
+        //die(var_dump(is_array($data_1)));
+
+        foreach ($data_1  as $otorgante){
+            //if(!isset($respuesta1[$otorgante->pregunta])) $respuesta1[$otorgante->pregunta] = $otorgante->respuesta;
+
+            if($otorgante->pregunta === 'Nombres y apellidos completos'){
+                $respuesta1['Nombres']= $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta  === 'Fecha de nacimiento' ){
+                $respuesta1['Edad'] = $otorgante->respuesta == null ? '0':$this->CalculaEdad($otorgante->respuesta);
+                $tmpNac = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta  === 'Nacionalidad'){
+                $respuesta1['Nacionalidad'] = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta  === 'Profesión y oficio'){
+                $respuesta1['Profesión y oficio'] = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta  === 'Domicilio'){
+                $respuesta1['Domicilio'] = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta  === 'Documento de identificación'){
+                $respuesta1['Documento de identificación'] = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === 'Nombre del padre'){
+                $tmpPadre = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === 'Nombre de la madre'){
+                $tmpMadre = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === 'Lugar de nacimiento'){
+                $tmpLg = $otorgante->respuesta;
+            }
+
+        }
+        //fill part two
+
+        $respuesta2 = array('Nacimiento' => array(
+            'Fecha de nacimiento' => $tmpNac,
+            'Lugar de nacimiento' => $tmpLg,
+            'Nombre de la madre' => $tmpMadre,
+            'Nombre del padre' =>$tmpPadre
+        ),'Estado civil' => array(), 'Hijos' => array());
+
+        $data_2 = DB::select('SELECT A.*,B.respuesta, C.label, C.respuesta as destalle
+                              From tbl_preguntas A
+                                LEFT JOIN tbl_respuestas B on A.ID = B.ID_pregunta AND B.ID_documento ='. $user->document_id .'
+                                LEFT JOIN tbl_respuesta_detalle C on B.ID = C.ID_respuesta
+                                WHERE A.paso = 3');
+
+        foreach( $data_2 as $datos){
+            if(!isset($fill[$datos->pregunta])) $fill[$datos->pregunta] = $datos->respuesta;
+
+            if($datos->pregunta =='¿Tienes hijos?'){
+                if($datos->respuesta === 'Si'){
+                   $hijos = RespuestaHijos::where('ID_documento','=',$user->document_id)->get();
+                    array_push($fill,$hijos->toArray());
+
+                }
+            }
+        }
+
+        array_push($respuesta2['Estado civil'],$fill );
+
+        return response()->json($response = array('Otorgante' => $respuesta1, 'Informacion personal' => $respuesta2));
+    }
+
 
     public function destroy(Request $request) {
         // Obtenemos los datos del token
@@ -264,5 +365,11 @@ class personalController extends Controller
             return response()->json('Registro Eliminado Satisfactoriamente');
 
         }
+    }
+
+    function CalculaEdad( $fecha ) {
+        die(var_dump($fecha));
+        list($Y,$m,$d) = explode("-",$fecha);
+        return( date("md") < $m.$d ? date("Y")-$Y-1 : date("Y")-$Y );
     }
 }

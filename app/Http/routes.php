@@ -32,6 +32,8 @@ Route::group(['middleware' => ['cors','jwt.auth']], function()
 
     Route::get('/getQuestions', 'personalController@getQuestions');           // Muestra El registro segun el user_id
 
+    Route::get('/getDocument', 'personalController@getDocument');     // Elimna El registro segun el user_id
+
     Route::get('/destroy', 'personalController@destroy');     // Elimna El registro segun el user_id
 
     Route::post('/update', 'personalController@update');      // Actualiza el registro
