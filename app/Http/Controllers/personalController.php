@@ -269,7 +269,7 @@ class personalController extends Controller
         $data_1 = DB::select('SELECT A.pregunta, B.respuesta
                                 From tbl_preguntas A
                                 LEFT JOIN tbl_respuestas B on A.ID = B.ID_pregunta AND B.ID_documento ='. $user->document_id .'
-                                WHERE A.paso = 2');
+                                WHERE A.paso in (1,2,7)');
 
         $respuesta1 = array();
 
@@ -315,6 +315,27 @@ class personalController extends Controller
                 $tmpLg = $otorgante->respuesta;
             }
 
+            if($otorgante->pregunta === '¿Alguna vez haz otorgado un testamento?'){
+
+                $tmpTestamente = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === '¿Quieres revocar tu otro testamento?'){
+                $tmpRevocar = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === 'Palabras Finales'){
+                $respuesta5 = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === '¿Puedes o sabes firmar?'){
+                $respuesta6 = $otorgante->respuesta;
+            }
+
+            if($otorgante->pregunta === 'Razon'){
+                $respuesta7 = $otorgante->respuesta;
+            }
+
         }
         //fill part two
 
@@ -325,27 +346,69 @@ class personalController extends Controller
             'Nombre del padre' =>$tmpPadre
         ),'Estado civil' => array(), 'Hijos' => array());
 
+
         $data_2 = DB::select('SELECT A.*,B.respuesta, C.label, C.respuesta as destalle
                               From tbl_preguntas A
                                 LEFT JOIN tbl_respuestas B on A.ID = B.ID_pregunta AND B.ID_documento ='. $user->document_id .'
                                 LEFT JOIN tbl_respuesta_detalle C on B.ID = C.ID_respuesta
-                                WHERE A.paso = 3');
+                                WHERE A.paso in (3,6,5)');
 
         foreach( $data_2 as $datos){
-            if(!isset($fill[$datos->pregunta])) $fill[$datos->pregunta] = $datos->respuesta;
 
-            if($datos->pregunta =='¿Tienes hijos?'){
-                if($datos->respuesta === 'Si'){
-                   $hijos = RespuestaHijos::where('ID_documento','=',$user->document_id)->get();
-                    array_push($fill,$hijos->toArray());
+            if(!isset($fill[$datos->pregunta]) && $datos->paso === 3) $fill[$datos->pregunta] = $datos->respuesta;
 
+            //Ejecutor
+            if(!isset($respuesta3[$datos->pregunta]) && $datos->paso === 6) $respuesta3[$datos->pregunta] = $datos->respuesta;
+
+            if(!isset($respuesta4[$datos->pregunta]) && $datos->paso === 5) $respuesta4[$datos->pregunta] = $datos->respuesta;
+
+
+            if($datos->pregunta === "¿Tienes hijos?"){
+                if($datos->respuesta === "si"){
+                    $hijos = RespuestaHijos::where('ID_documento','=',$user->document_id)->get();
+                    if($hijos->toArray() > 0){
+
+                        $respuesta2['Hijos'] = $hijos->toArray();
+                    }
                 }
             }
+
+        }
+
+        //Herencia
+
+        $Actives = RespuestaActivos::where('ID_documento','=',$user->document_id)->get();
+
+        if($Actives){
+            $Activos = $Actives->toArray();
+        }
+
+        $properties = RespuestaPropiedad::where('ID_documento','=',$user->document_id)->get();
+
+        if($properties){
+            $propiedades = $properties->toArray();
+        }
+
+        $financial = RespuestaFinanciero::where('ID_documento','=',$user->document_id)->get();
+
+        if($financial){
+            $financiero = $financial->toArray();
         }
 
         array_push($respuesta2['Estado civil'],$fill );
 
-        return response()->json($response = array('Otorgante' => $respuesta1, 'Informacion personal' => $respuesta2));
+
+
+        return response()->json($response = array('Otorgante' => $respuesta1,
+                                                    'Informacion personal' => $respuesta2,
+                                                    'Ejecutor' => $respuesta3,
+                                                    'OTROS TESTAMENTOS' =>
+                                                        array('Testamento anterior'=> $tmpTestamente, 'Revocar'=>$tmpRevocar),
+                                                    'Herencia' => array('Activos' => $Activos, 'Financiero'=>$financiero,'propiedades'=>$propiedades ),
+                                                    'Herederos'=> $respuesta4,
+                                                    'Sabes firmar'=> $respuesta6,
+                                                    'Razon' => $respuesta7,
+                                                    'Palabras Finales'=>$respuesta5));
     }
 
 
@@ -368,7 +431,6 @@ class personalController extends Controller
     }
 
     function CalculaEdad( $fecha ) {
-        die(var_dump($fecha));
         list($Y,$m,$d) = explode("-",$fecha);
         return( date("md") < $m.$d ? date("Y")-$Y-1 : date("Y")-$Y );
     }
