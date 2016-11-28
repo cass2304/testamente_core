@@ -307,11 +307,11 @@ class personalController extends Controller
                 $tmpPadre = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === 'Nombre de la madre'){
+            if($otorgante->pregunta === 'Nombre_de_la_madre'){
                 $tmpMadre = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === 'Lugar de nacimiento'){
+            if($otorgante->pregunta === 'Lugar_de_nacimiento'){
                 $tmpLg = $otorgante->respuesta;
             }
 
