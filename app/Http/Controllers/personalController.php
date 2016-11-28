@@ -278,11 +278,11 @@ class personalController extends Controller
         foreach ($data_1  as $otorgante){
             //if(!isset($respuesta1[$otorgante->pregunta])) $respuesta1[$otorgante->pregunta] = $otorgante->respuesta;
 
-            if($otorgante->pregunta === 'Nombres y apellidos completos'){
+            if($otorgante->pregunta === 'Nombres_y_apellidos_completos'){
                 $respuesta1['Nombres']= $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta  === 'Fecha de nacimiento' ){
+            if($otorgante->pregunta  === 'Fecha_de_nacimiento' ){
                 $respuesta1['Edad'] = $otorgante->respuesta == null ? '0':$this->CalculaEdad($otorgante->respuesta);
                 $tmpNac = $otorgante->respuesta;
             }
@@ -291,7 +291,7 @@ class personalController extends Controller
                 $respuesta1['Nacionalidad'] = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta  === 'Profesión y oficio'){
+            if($otorgante->pregunta  === 'Profesión_y_oficio'){
                 $respuesta1['Profesion_oficio'] = $otorgante->respuesta;
             }
 
@@ -299,11 +299,11 @@ class personalController extends Controller
                 $respuesta1['Domicilio'] = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta  === 'Documento de identificación'){
+            if($otorgante->pregunta  === 'Documento_de_identificación'){
                 $respuesta1['Documento_de_identificacion'] = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === 'Nombre del padre'){
+            if($otorgante->pregunta === 'Nombre_del_padre'){
                 $tmpPadre = $otorgante->respuesta;
             }
 
@@ -315,20 +315,20 @@ class personalController extends Controller
                 $tmpLg = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === '¿Alguna vez haz otorgado un testamento?'){
+            if($otorgante->pregunta === 'Alguna_vez_haz_otorgado_un_testamento'){
 
                 $tmpTestamente = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === '¿Quieres revocar tu otro testamento?'){
+            if($otorgante->pregunta === 'Quieres_revocar_tu_otro_testamento'){
                 $tmpRevocar = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === 'Palabras Finales'){
+            if($otorgante->pregunta === 'Palabras_Finales'){
                 $respuesta5 = $otorgante->respuesta;
             }
 
-            if($otorgante->pregunta === '¿Puedes o sabes firmar?'){
+            if($otorgante->pregunta === 'Puedes_o_sabes_firmar'){
                 $respuesta6 = $otorgante->respuesta;
             }
 
@@ -363,7 +363,7 @@ class personalController extends Controller
             if(!isset($respuesta4[$datos->pregunta]) && $datos->paso === 5) $respuesta4[$datos->pregunta] = $datos->respuesta;
 
 
-            if($datos->pregunta === "¿Tienes_hijos?"){
+            if($datos->pregunta === "Tienes_hijos"){
                 if($datos->respuesta === "si"){
                     $hijos = RespuestaHijos::where('ID_documento','=',$user->document_id)->get();
                     if($hijos->toArray() > 0){
