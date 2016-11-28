@@ -292,7 +292,7 @@ class personalController extends Controller
             }
 
             if($otorgante->pregunta  === 'Profesión y oficio'){
-                $respuesta1['Profesión y oficio'] = $otorgante->respuesta;
+                $respuesta1['Profesion_oficio'] = $otorgante->respuesta;
             }
 
             if($otorgante->pregunta  === 'Domicilio'){
@@ -300,7 +300,7 @@ class personalController extends Controller
             }
 
             if($otorgante->pregunta  === 'Documento de identificación'){
-                $respuesta1['Documento de identificación'] = $otorgante->respuesta;
+                $respuesta1['Documento_de_identificacion'] = $otorgante->respuesta;
             }
 
             if($otorgante->pregunta === 'Nombre del padre'){
@@ -340,11 +340,11 @@ class personalController extends Controller
         //fill part two
 
         $respuesta2 = array('Nacimiento' => array(
-            'Fecha de nacimiento' => $tmpNac,
-            'Lugar de nacimiento' => $tmpLg,
-            'Nombre de la madre' => $tmpMadre,
-            'Nombre del padre' =>$tmpPadre
-        ),'Estado civil' => array(), 'Hijos' => array());
+            'Fecha_de_nacimiento' => $tmpNac,
+            'Lugar_de_nacimiento' => $tmpLg,
+            'Nombre_de_la_madre' => $tmpMadre,
+            'Nombre_del_padre' =>$tmpPadre
+        ),'Estado_civil' => array(), 'Hijos' => array());
 
 
         $data_2 = DB::select('SELECT A.*,B.respuesta, C.label, C.respuesta as destalle
@@ -363,7 +363,7 @@ class personalController extends Controller
             if(!isset($respuesta4[$datos->pregunta]) && $datos->paso === 5) $respuesta4[$datos->pregunta] = $datos->respuesta;
 
 
-            if($datos->pregunta === "¿Tienes hijos?"){
+            if($datos->pregunta === "¿Tienes_hijos?"){
                 if($datos->respuesta === "si"){
                     $hijos = RespuestaHijos::where('ID_documento','=',$user->document_id)->get();
                     if($hijos->toArray() > 0){
@@ -395,20 +395,20 @@ class personalController extends Controller
             $financiero = $financial->toArray();
         }
 
-        array_push($respuesta2['Estado civil'],$fill );
+        array_push($respuesta2['Estado_civil'],$fill );
 
 
 
         return response()->json($response = array('Otorgante' => $respuesta1,
-                                                    'Informacion personal' => $respuesta2,
+                                                    'Informacion_personal' => $respuesta2,
                                                     'Ejecutor' => $respuesta3,
-                                                    'OTROS TESTAMENTOS' =>
-                                                        array('Testamento anterior'=> $tmpTestamente, 'Revocar'=>$tmpRevocar),
+                                                    'Otros_testamentos' =>
+                                                        array('Testamento_anterior'=> $tmpTestamente, 'Revocar'=>$tmpRevocar),
                                                     'Herencia' => array('Activos' => $Activos, 'Financiero'=>$financiero,'propiedades'=>$propiedades ),
                                                     'Herederos'=> $respuesta4,
-                                                    'Sabes firmar'=> $respuesta6,
+                                                    'sabes_firmar'=> $respuesta6,
                                                     'Razon' => $respuesta7,
-                                                    'Palabras Finales'=>$respuesta5));
+                                                    'palabras_finales'=>$respuesta5));
     }
 
 
